@@ -1,5 +1,6 @@
 specification: FinOps Framework
 specificationVersion: '1.0'
+schema: https://www.finops.org/framework/
 alignedWith:
   framework: FinOps Foundation Framework
   frameworkUrl: https://www.finops.org/framework/
@@ -8,10 +9,11 @@ alignedWith:
   dataSpecUrl: https://focus.finops.org/focus-specification/v1-3/
 provider: HealthEquity
 providerId: healthequity
-publisherName: HealthEquity
-serviceCategory: API
+publisherName: HealthEquity, Inc.
+serviceCategory: Healthcare Benefits / HSA Custodian Partner API
 created: '2026-05-04'
-modified: '2026-05-04'
+modified: '2026-05-05'
+reconciled: false
 tags:
   - Healthcare
   - HSA
@@ -19,20 +21,26 @@ tags:
   - FinOps
   - Cost Management
   - FOCUS
-description: FinOps framework definition for the HealthEquity API surface. Provides a FOCUS-aligned mapping
-  for cost allocation, usage measurement, and unit-economics reporting across the provider's APIs.
+description: 'FOCUS-aligned FinOps placeholder for HealthEquity: employer / benefits-admin partner
+  integration bundled into the broader benefits administration contract. Meters describe
+  enrollment-driven volumes and contribution events used for capacity allocation.'
+notes: No public commercial model is published for the API. Reconcile against the partner / employer
+  agreement.
+sources:
+  - https://www.healthequity.com/
 principles:
   - name: Visibility
-    description: Make API consumption costs visible to engineering, product, and finance teams in near
-      real-time.
+    description: Track API request volume via the HealthEquity partner gateway logs; correlate with
+      enrollment events and contribution cycles.
   - name: Allocation
-    description: Tag every chargeable API call with the consuming team, environment, application, and
-      feature so cost can be allocated.
+    description: Allocate integration cost across employer clients and benefit programs (HSA / FSA
+      / HRA / commuter) using the calling partner identifier.
   - name: Optimization
-    description: Continuously evaluate request patterns, caching, batching, and tier selection to reduce
-      cost per useful unit of work.
+    description: Batch enrollment uploads and contribution files; cache employer / plan reference
+      data; pre-warm capacity ahead of open enrollment.
   - name: Accountability
-    description: Establish budget owners and chargeback or showback flows for each consuming team.
+    description: Designate a HealthEquity integration owner per partner; review API utilization at
+      year-end with attention to open-enrollment surges.
 domains:
   - name: Understand Usage and Cost
     capabilities:
@@ -62,53 +70,47 @@ domains:
       - Onboarding Workloads
       - Intersecting Disciplines
 billingModel:
-  pricingCategory: Usage-Based
-  billingFrequency: Monthly
+  pricingCategory: Subscription
+  billingFrequency: Annual
   billingCurrency: USD
   chargeCategories:
-    - Usage
     - Purchase
     - Tax
-    - Credit
     - Adjustment
   chargeFrequency: Recurring
 focusColumns:
-  ServiceName: HealthEquity
-  ServiceCategory: Developer Tools / API
+  ServiceName: HealthEquity API
+  ServiceCategory: Healthcare Benefits / HSA Custodian Partner API
   ProviderName: HealthEquity
-  PublisherName: HealthEquity
-  InvoiceIssuerName: HealthEquity
-  PricingCategory: Usage-Based
-  PricingUnit: request
+  PublisherName: HealthEquity, Inc.
+  InvoiceIssuerName: HealthEquity, Inc.
+  PricingCategory: Subscription
+  PricingUnit: partner-agreement
   BillingCurrency: USD
-  ChargeCategory: Usage
+  ChargeCategory: Purchase
 meters:
   - name: api_requests
-    description: Count of billable API requests
+    description: Partner-integration request volume (allocation meter)
     unit: request
     aggregation: sum
     dimensions:
-      - api
+      - partner
+      - employer
       - endpoint
-      - tier
-      - region
-      - consumer
-  - name: data_egress
-    description: Bytes returned over the network in API responses
-    unit: GB
+  - name: enrollments_processed
+    description: Member enrollment events processed via the API
+    unit: enrollment
     aggregation: sum
     dimensions:
-      - api
-      - region
-      - consumer
-  - name: compute_seconds
-    description: Server-side compute consumed by the request, where applicable
-    unit: second
+      - employer
+      - benefit_type
+  - name: contribution_files
+    description: Contribution / payroll files processed
+    unit: file
     aggregation: sum
     dimensions:
-      - api
-      - endpoint
-      - tier
+      - employer
+      - benefit_type
 apis:
   - name: HealthEquity API
     baseURL: https://api.healthequity.com
@@ -119,11 +121,11 @@ apis:
     serviceName: HealthEquity API
     serviceCategory: API
 unitEconomics:
-  - name: Cost per 1K Requests
-    metric: billed_cost / (api_requests / 1000)
+  - name: Cost per Enrollment Processed
+    metric: billed_cost / enrollments_processed
     target: TBD
-  - name: Cost per Active Consumer
-    metric: billed_cost / active_consumers
+  - name: Cost per Employer Client
+    metric: billed_cost / active_employers
     target: TBD
 maintainers:
   - FN: Kin Lane
