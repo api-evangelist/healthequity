@@ -28,6 +28,10 @@ apis:
     description: >-
       The HealthEquity API provides access to platform services and data for enterprise integration and automation.
 common:
+  - type: VulnerabilityDisclosure
+    url: security/healthequity-vulnerability-disclosure.yml
+  - type: DomainSecurity
+    url: security/healthequity-domain-security.yml
   - type: LinkedIn
     url: https://www.linkedin.com/company/healthequity
   - type: Website
