@@ -126,10 +126,8 @@ apis:
 unitEconomics:
   - name: Cost per Enrollment Processed
     metric: billed_cost / enrollments_processed
-    target: TBD
   - name: Cost per Employer Client
     metric: billed_cost / active_employers
-    target: TBD
 maintainers:
   - FN: Kin Lane
     email: kin@apievangelist.com
